@@ -4,151 +4,1090 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Periodic Table</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --alkali-metals: #ff8a65;
+            --alkaline-earth: #ffb74d;
+            --transition-metals: #4fc3f7;
+            --post-transition: #81c784;
+            --metalloids: #9575cd;
+            --nonmetals: #64b5f6;
+            --halogens: #4dd0e1;
+            --noble-gases: #ba68c8;
+            --lanthanides: #f06292;
+            --actinides: #7986cb;
+            --unknown: #e0e0e0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #fff;
+            padding: 20px;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ff8a65, #ba68c8, #4fc3f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+        
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .element {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 80px;
+        }
+        
+        .element:hover {
+            transform: translateY(-5px) scale(1.05);
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4), 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        .element:active {
+            transform: scale(0.95);
+        }
+        
+        .element::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .element:hover::before {
+            left: 100%;
+        }
+        
+        .element .atomic-number {
+            font-size: 0.7rem;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            opacity: 0.8;
+        }
+        
+        .element .symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0 2px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .element .symbol::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+        
+        .element:hover .symbol::after {
+            width: 60%;
+        }
+        
+        .element .name {
+            font-size: 0.65rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 4px;
+        }
+        
+        .element .mass {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+        }
+        
+        .element .icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        /* Category styles with gradients */
+        .alkali-metals { 
+            background: linear-gradient(145deg, var(--alkali-metals), #e65100);
+            color: #000;
+        }
+        
+        .alkaline-earth { 
+            background: linear-gradient(145deg, var(--alkaline-earth), #ef6c00);
+            color: #000;
+        }
+        
+        .transition-metals { 
+            background: linear-gradient(145deg, var(--transition-metals), #0277bd);
+            color: #000;
+        }
+        
+        .post-transition { 
+            background: linear-gradient(145deg, var(--post-transition), #2e7d32);
+            color: #000;
+        }
+        
+        .metalloids { 
+            background: linear-gradient(145deg, var(--metalloids), #5e35b1);
+            color: #000;
+        }
+        
+        .nonmetals { 
+            background: linear-gradient(145deg, var(--nonmetals), #1565c0);
+            color: #000;
+        }
+        
+        .halogens { 
+            background: linear-gradient(145deg, var(--halogens), #00838f);
+            color: #000;
+        }
+        
+        .noble-gases { 
+            background: linear-gradient(145deg, var(--noble-gases), #8e24aa);
+            color: #000;
+        }
+        
+        .lanthanides { 
+            background: linear-gradient(145deg, var(--lanthanides), #c2185b);
+            color: #000;
+        }
+        
+        .actinides { 
+            background: linear-gradient(145deg, var(--actinides), #303f9f);
+            color: #000;
+        }
+        
+        .unknown { 
+            background: linear-gradient(145deg, var(--unknown), #9e9e9e);
+            color: #000;
+        }
+        
+        .placeholder {
+            background-color: transparent;
+            cursor: default;
+        }
+        
+        .placeholder:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .element-details {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(25, 25, 35, 0.97);
+            border-radius: 16px;
+            padding: 40px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .element-details.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        .element-details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 30px;
+        }
+        
+        .element-details-symbol-container {
+            position: relative;
+            margin-right: 40px;
+        }
+        
+        .element-details-symbol {
+            font-size: 4rem;
+            font-weight: bold;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+            transform: rotate(-5deg);
+        }
+        
+        .element-details-symbol::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .element-details.active .element-details-symbol::before {
+            transform: scaleX(1);
+        }
+        
+        .element-details-atomic-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+        
+        .element-details-info {
+            flex-grow: 1;
+        }
+        
+        .element-details-name {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .element-details-category {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            padding: 6px 15px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .element-details-summary {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .element-details-properties {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .property-group {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .property-group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+        
+        .property-group h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            position: relative;
+        }
+        
+        .property {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .property-name {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+        
+        .property-value {
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .element-details-footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1rem;
+            color: #aaa;
+            font-style: italic;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 82, 82, 0.8);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 999;
+            backdrop-filter: blur(8px);
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .legend-text {
+            font-size: 0.9rem;
+        }
+        
+        /* Animation for elements appearing */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Animation for pulse effect */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+        
+        .element {
+            animation: fadeInUp 0.5s backwards;
+        }
+        
+        /* Responsive styling */
+        @media (max-width: 1200px) {
+            .periodic-table {
+                grid-template-columns: repeat(14, 1fr);
+                font-size: 0.9rem;
+            }
+            
+            .element .symbol {
+                font-size: 1.2rem;
+            }
+            
+            .element .name,
+            .element .mass {
+                font-size: 0.6rem;
+            }
+            
+            .element-details-properties {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .periodic-table {
+                grid-template-columns: repeat(9, 1fr);
+            }
+            
+            .element-details-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .element-details-symbol-container {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .element-details-name {
+                font-size: 2rem;
+            }
+            
+            .element-details {
+                padding: 25px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .periodic-table {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .property-group {
+                padding: 15px;
+            }
+            
+            .element-details-symbol {
+                width: 90px;
+                height: 90px;
+                font-size: 3rem;
+            }
+            
+            .element-details-name {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <header>
-            <h1>Interactive Periodic Table</h1>
-            <div class="controls">
-                <div class="search-container">
-                    <input type="text" id="element-search" placeholder="Search element...">
-                    <div id="search-results" class="search-results"></div>
-                </div>
-                <div class="view-controls">
-                    <button id="view-standard" class="active">Standard</button>
-                    <button id="view-temp">Melting Point</button>
-                    <button id="view-electronegativity">Electronegativity</button>
-                    <button id="view-density">Density</button>
-                </div>
-                <div class="category-legend">
-                    <div class="legend-item"><span class="legend-color alkali-metals"></span> Alkali Metals</div>
-                    <div class="legend-item"><span class="legend-color alkaline-earth-metals"></span> Alkaline Earth Metals</div>
-                    <div class="legend-item"><span class="legend-color transition-metals"></span> Transition Metals</div>
-                    <div class="legend-item"><span class="legend-color post-transition-metals"></span> Post-transition Metals</div>
-                    <div class="legend-item"><span class="legend-color metalloids"></span> Metalloids</div>
-                    <div class="legend-item"><span class="legend-color nonmetals"></span> Nonmetals</div>
-                    <div class="legend-item"><span class="legend-color halogens"></span> Halogens</div>
-                    <div class="legend-item"><span class="legend-color noble-gases"></span> Noble Gases</div>
-                    <div class="legend-item"><span class="legend-color lanthanides"></span> Lanthanides</div>
-                    <div class="legend-item"><span class="legend-color actinides"></span> Actinides</div>
-                    <div class="legend-item"><span class="legend-color unknown"></span> Unknown Properties</div>
-                </div>
+    <div class="container">
+        <h1>Interactive Periodic Table of Elements</h1>
+        <div class="periodic-table" id="periodic-table"></div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--alkali-metals), #e65100);"></div>
+                <span class="legend-text">Alkali Metals</span>
             </div>
-        </header>
-
-        <main>
-            <div class="periodic-table" id="periodic-table">
-                <!-- Elements will be generated by JavaScript -->
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--alkaline-earth), #ef6c00);"></div>
+                <span class="legend-text">Alkaline Earth Metals</span>
             </div>
-
-            <div class="lanthanide-actinide-container">
-                <div class="lanthanide-row" id="lanthanide-row">
-                    <!-- Lanthanides will be generated by JavaScript -->
-                </div>
-                <div class="actinide-row" id="actinide-row">
-                    <!-- Actinides will be generated by JavaScript -->
-                </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--transition-metals), #0277bd);"></div>
+                <span class="legend-text">Transition Metals</span>
             </div>
-        </main>
-
-        <div id="element-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-button">&times;</span>
-                    <div class="element-symbol-large"></div>
-                    <div class="element-basics">
-                        <h2 class="element-name"></h2>
-                        <p class="element-number"></p>
-                        <p class="element-category"></p>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="tabs">
-                        <button class="tab-button active" data-tab="properties">Properties</button>
-                        <button class="tab-button" data-tab="electron">Electron Configuration</button>
-                        <button class="tab-button" data-tab="isotopes">Isotopes</button>
-                        <button class="tab-button" data-tab="uses">Uses & Applications</button>
-                    </div>
-                    <div class="tab-content">
-                        <div id="properties" class="tab-pane active">
-                            <div class="properties-grid">
-                                <div class="property">
-                                    <h4>Atomic Mass</h4>
-                                    <p class="atomic-mass"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>State at STP</h4>
-                                    <p class="state"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Melting Point</h4>
-                                    <p class="melting-point"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Boiling Point</h4>
-                                    <p class="boiling-point"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Electronegativity</h4>
-                                    <p class="electronegativity"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Density</h4>
-                                    <p class="density"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Year Discovered</h4>
-                                    <p class="discovered"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Group</h4>
-                                    <p class="group"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Period</h4>
-                                    <p class="period"></p>
-                                </div>
-                                <div class="property">
-                                    <h4>Atomic Radius</h4>
-                                    <p class="atomic-radius"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="electron" class="tab-pane">
-                            <div class="electron-container">
-                                <div class="electron-configuration">
-                                    <h3>Electron Configuration</h3>
-                                    <p class="electron-config-full"></p>
-                                    <p class="electron-config-short"></p>
-                                </div>
-                                <div id="electron-shell-visualization" class="electron-shell-visualization">
-                                    <!-- Electron shells will be generated by JavaScript -->
-                                </div>
-                                <div class="electron-shell-info">
-                                    <h3>Electron Shell Distribution</h3>
-                                    <p class="electron-shells"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="isotopes" class="tab-pane">
-                            <h3>Common Isotopes</h3>
-                            <div class="isotope-container">
-                                <!-- Isotopes will be generated by JavaScript -->
-                            </div>
-                        </div>
-                        <div id="uses" class="tab-pane">
-                            <h3>Uses & Applications</h3>
-                            <div class="uses-container">
-                                <!-- Uses will be generated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--post-transition), #2e7d32);"></div>
+                <span class="legend-text">Post-Transition Metals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--metalloids), #5e35b1);"></div>
+                <span class="legend-text">Metalloids</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--nonmetals), #1565c0);"></div>
+                <span class="legend-text">Nonmetals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--halogens), #00838f);"></div>
+                <span class="legend-text">Halogens</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--noble-gases), #8e24aa);"></div>
+                <span class="legend-text">Noble Gases</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--lanthanides), #c2185b);"></div>
+                <span class="legend-text">Lanthanides</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(145deg, var(--actinides), #303f9f);"></div>
+                <span class="legend-text">Actinides</span>
             </div>
         </div>
     </div>
-
-    <script src="script.js"></script>
+    
+    <div class="element-details" id="element-details">
+        <button class="close-btn" id="close-btn">×</button>
+        <div class="element-details-header">
+            <div class="element-details-symbol-container">
+                <div class="element-details-symbol" id="details-symbol">H</div>
+                <div class="element-details-atomic-number" id="details-atomic-number">1</div>
+            </div>
+            <div class="element-details-info">
+                <h2 class="element-details-name" id="details-name">Hydrogen</h2>
+                <div class="element-details-category" id="details-category">Nonmetal</div>
+                <p class="element-details-summary" id="details-summary">Hydrogen is the lightest and most abundant element in the universe.</p>
+            </div>
+        </div>
+        
+        <div class="element-details-properties">
+            <div class="property-group">
+                <h3>Basic Properties</h3>
+                <div class="property">
+                    <div class="property-name">Atomic Number</div>
+                    <div class="property-value" id="details-atomic-number-value">1</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Atomic Mass</div>
+                    <div class="property-value" id="details-atomic-mass">1.008 u</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Electron Configuration</div>
+                    <div class="property-value" id="details-electron-config">1s¹</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Period</div>
+                    <div class="property-value" id="details-period">1</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Group</div>
+                    <div class="property-value" id="details-group">1</div>
+                </div>
+            </div>
+            
+            <div class="property-group">
+                <h3>Physical Properties</h3>
+                <div class="property">
+                    <div class="property-name">State at STP</div>
+                    <div class="property-value" id="details-state">Gas</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Melting Point</div>
+                    <div class="property-value" id="details-melting">14.01 K</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Boiling Point</div>
+                    <div class="property-value" id="details-boiling">20.28 K</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Density</div>
+                    <div class="property-value" id="details-density">0.08988 g/L</div>
+                </div>
+            </div>
+            
+            <div class="property-group">
+                <h3>Atomic Properties</h3>
+                <div class="property">
+                    <div class="property-name">Electronegativity</div>
+                    <div class="property-value" id="details-electronegativity">2.20</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Ionization Energy</div>
+                    <div class="property-value" id="details-ionization">13.6 eV</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Atomic Radius</div>
+                    <div class="property-value" id="details-radius">120 pm</div>
+                </div>
+                <div class="property">
+                    <div class="property-name">Crystal Structure</div>
+                    <div class="property-value" id="details-crystal">Hexagonal</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="element-details-footer">
+            <p id="details-discovery">Discovered by Henry Cavendish in 1766</p>
+        </div>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    
+    <script>
+        // Element icons for visual representation
+        const elementIcons = {
+            'H': '⚛️', // Hydrogen
+            'He': '🎈', // Helium (balloon)
+            'Li': '🔋', // Lithium (battery)
+            'Be': '💎', // Beryllium
+            'B': '🧪', // Boron
+            'C': '💍', // Carbon (diamond)
+            'N': '🌫️', // Nitrogen (fog)
+            'O': '💨', // Oxygen
+            'F': '🧼', // Fluorine (cleaning)
+            'Ne': '💡', // Neon (light)
+            'Na': '🧂', // Sodium (salt)
+            'Mg': '✨', // Magnesium (sparkle)
+            'Al': '🥫', // Aluminum (can)
+            'Si': '🖥️', // Silicon (computer)
+            'P': '🔥', // Phosphorus (fire)
+            'S': '🌋', // Sulfur (volcano)
+            'Cl': '🏊', // Chlorine (swimming)
+            'Ar': '🛡️', // Argon (shield)
+            'K': '🍌', // Potassium (banana)
+            'Ca': '🦴', // Calcium (bone)
+            'Fe': '⚙️', // Iron (gear)
+            'Cu': '🔌', // Copper (electricity)
+            'Ag': '🥈', // Silver (medal)
+            'Au': '🥇', // Gold (medal)
+            'Pb': '🔍', // Lead (magnifying glass)
+            'U': '☢️', // Uranium (radioactive)
+            // Default icon for other elements
+            'default': '⚗️'
+        };
+        
+        const elements = [
+            // Row 1
+            {number: 1, symbol: 'H', name: 'Hydrogen', mass: '1.008', category: 'nonmetals', row: 1, col: 1, 
+             state: 'Gas', melting: '14.01 K', boiling: '20.28 K', density: '0.08988 g/L', 
+             electronConfig: '1s¹', electronegativity: '2.20', ionizationEnergy: '13.6 eV', atomicRadius: '120 pm',
+             crystal: 'Hexagonal', discovery: 'Discovered by Henry Cavendish in 1766',
+             summary: 'Hydrogen is the lightest and most abundant element in the universe. It is primarily used in oil refining, ammonia production for fertilizers, and as a potential clean energy carrier.'},
+            {number: 2, symbol: 'He', name: 'Helium', mass: '4.003', category: 'noble-gases', row: 1, col: 18,
+             state: 'Gas', melting: '0.95 K', boiling: '4.22 K', density: '0.1786 g/L', 
+             electronConfig: '1s²', electronegativity: 'N/A', ionizationEnergy: '24.6 eV', atomicRadius: '140 pm',
+             crystal: 'FCC', discovery: 'First detected by Pierre Janssen in 1868',
+             summary: 'Helium is the second most abundant element in the universe. It is used in cryogenics, pressurizing rocket fuel, and as a cooling medium for nuclear reactors and MRI machines.'},
+            
+            // Row 2
+            {number: 3, symbol: 'Li', name: 'Lithium', mass: '6.94', category: 'alkali-metals', row: 2, col: 1,
+             state: 'Solid', melting: '453.69 K', boiling: '1603 K', density: '0.534 g/cm³', 
+             electronConfig: '[He]2s¹', electronegativity: '0.98', ionizationEnergy: '5.39 eV', atomicRadius: '182 pm',
+             crystal: 'BCC', discovery: 'Discovered by Johan August Arfwedson in 1817',
+             summary: 'Lithium is the lightest metal and the least dense solid element. It is primarily used in rechargeable batteries, particularly for electric vehicles and portable electronics.'},
+            {number: 4, symbol: 'Be', name: 'Beryllium', mass: '9.012', category: 'alkaline-earth', row: 2, col: 2,
+             state: 'Solid', melting: '1560 K', boiling: '2742 K', density: '1.85 g/cm³', 
+             electronConfig: '[He]2s²', electronegativity: '1.57', ionizationEnergy: '9.32 eV', atomicRadius: '153 pm',
+             crystal: 'HCP', discovery: 'Discovered by Louis Nicolas Vauquelin in 1798',
+             summary: 'Beryllium is a rare element with high thermal conductivity. It is used in aerospace applications, X-ray equipment, and nuclear reactors due to its strength and light weight.'},
+            {number: 5, symbol: 'B', name: 'Boron', mass: '10.81', category: 'metalloids', row: 2, col: 13,
+             state: 'Solid', melting: '2349 K', boiling: '4200 K', density: '2.34 g/cm³', 
+             electronConfig: '[He]2s²2p¹', electronegativity: '2.04', ionizationEnergy: '8.30 eV', atomicRadius: '192 pm',
+             crystal: 'Rhombohedral', discovery: 'Identified by Joseph Louis Gay-Lussac and Louis Jacques Thénard in 1808',
+             summary: 'Boron is a semiconductor with high melting point. It is primarily used in borosilicate glass, detergents, and as a dopant in semiconductors.'},
+            {number: 6, symbol: 'C', name: 'Carbon', mass: '12.01', category: 'nonmetals', row: 2, col: 14,
+             state: 'Solid', melting: '3823 K', boiling: '4300 K', density: '2.267 g/cm³', 
+             electronConfig: '[He]2s²2p²', electronegativity: '2.55', ionizationEnergy: '11.26 eV', atomicRadius: '170 pm',
+             crystal: 'Hexagonal', discovery: 'Known since ancient times',
+             summary: 'Carbon is the basis of organic chemistry and life on Earth. It exists in various forms including diamond, graphite, and fullerenes, and is used in steel production, nanotechnology, and countless other applications.'},
+            {number: 7, symbol: 'N', name: 'Nitrogen', mass: '14.01', category: 'nonmetals', row: 2, col: 15,
+             state: 'Gas', melting: '63.15 K', boiling: '77.36 K', density: '1.251 g/L', 
+             electronConfig: '[He]2s²2p³', electronegativity: '3.04', ionizationEnergy: '14.53 eV', atomicRadius: '155 pm',
+             crystal: 'Hexagonal', discovery: 'Discovered by Daniel Rutherford in 1772',
+             summary: 'Nitrogen makes up about 78% of Earth\'s atmosphere. It is essential for life and is used in fertilizers, refrigeration, and as an inert atmosphere for chemical processes.'},
+            {number: 8, symbol: 'O', name: 'Oxygen', mass: '16.00', category: 'nonmetals', row: 2, col: 16,
+             state: 'Gas', melting: '54.36 K', boiling: '90.20 K', density: '1.429 g/L', 
+             electronConfig: '[He]2s²2p⁴', electronegativity: '3.44', ionizationEnergy: '13.62 eV', atomicRadius: '152 pm',
+             crystal: 'Cubic', discovery: 'Discovered by Carl Wilhelm Scheele in 1771',
+             summary: 'Oxygen is the third most abundant element in the universe and makes up about 21% of Earth\'s atmosphere. It is essential for respiration and combustion processes.'},
+            {number: 9, symbol: 'F', name: 'Fluorine', mass: '19.00', category: 'halogens', row: 2, col: 17,
+             state: 'Gas', melting: '53.53 K', boiling: '85.03 K', density: '1.696 g/L', 
+             electronConfig: '[He]2s²2p⁵', electronegativity: '3.98', ionizationEnergy: '17.42 eV', atomicRadius: '135 pm',
+             crystal: 'Cubic', discovery: 'Isolated by Henri Moissan in 1886',
+             summary: 'Fluorine is the most electronegative element and extremely reactive. It is used in uranium enrichment, refrigerants, and as fluoride in dental health products.'},
+            {number: 10, symbol: 'Ne', name: 'Neon', mass: '20.18', category: 'noble-gases', row: 2, col: 18,
+             state: 'Gas', melting: '24.56 K', boiling: '27.07 K', density: '0.9002 g/L', 
+             electronConfig: '[He]2s²2p⁶', electronegativity: 'N/A', ionizationEnergy: '21.56 eV', atomicRadius: '154 pm',
+             crystal: 'FCC', discovery: 'Discovered by William Ramsay and Morris Travers in 1898',
+             summary: 'Neon is a noble gas with distinctive reddish-orange glow when used in discharge tubes. It is primarily used in neon signs, lasers, and cryogenic research.'},
+            
+            // Row 3
+            {number: 11, symbol: 'Na', name: 'Sodium', mass: '22.99', category: 'alkali-metals', row: 3, col: 1,
+             state: 'Solid', melting: '370.87 K', boiling: '1156 K', density: '0.968 g/cm³', 
+             electronConfig: '[Ne]3s¹', electronegativity: '0.93', ionizationEnergy: '5.14 eV', atomicRadius: '227 pm',
+             crystal: 'BCC', discovery: 'Isolated by Humphry Davy in 1807',
+             summary: 'Sodium is a highly reactive alkali metal. It is essential for biological functions and is widely used in sodium vapor lamps, the chemical industry, and as table salt (sodium chloride).'},
+            {number: 12, symbol: 'Mg', name: 'Magnesium', mass: '24.31', category: 'alkaline-earth', row: 3, col: 2,
+             state: 'Solid', melting: '923 K', boiling: '1363 K', density: '1.738 g/cm³', 
+             electronConfig: '[Ne]3s²', electronegativity: '1.31', ionizationEnergy: '7.65 eV', atomicRadius: '173 pm',
+             crystal: 'HCP', discovery: 'Isolated by Humphry Davy in 1808',
+             summary: 'Magnesium is a lightweight, silvery-white metal. It is essential for biological processes and is used in lightweight alloys, flash photography, and pyrotechnics.'},
+            {number: 13, symbol: 'Al', name: 'Aluminum', mass: '26.98', category: 'post-transition', row: 3, col: 13,
+             state: 'Solid', melting: '933.47 K', boiling: '2792 K', density: '2.70 g/cm³', 
+             electronConfig: '[Ne]3s²3p¹', electronegativity: '1.61', ionizationEnergy: '5.99 eV', atomicRadius: '184 pm',
+             crystal: 'FCC', discovery: 'First produced by Hans Christian Ørsted in 1825',
+             summary: 'Aluminum is the most abundant metal in Earth\'s crust. It is lightweight, corrosion-resistant, and used in transportation, packaging, construction, and electrical transmission lines.'},
+            {number: 14, symbol: 'Si', name: 'Silicon', mass: '28.09', category: 'metalloids', row: 3, col: 14,
+             state: 'Solid', melting: '1687 K', boiling: '3538 K', density: '2.33 g/cm³', 
+             electronConfig: '[Ne]3s²3p²', electronegativity: '1.90', ionizationEnergy: '8.15 eV', atomicRadius: '210 pm',
+             crystal: 'Diamond cubic', discovery: 'Isolated by Jöns Jacob Berzelius in 1824',
+             summary: 'Silicon is the second most abundant element in Earth\'s crust. It is crucial for the semiconductor industry, solar cells, and as silicates in glass, ceramics, and cement.'},
+            {number: 15, symbol: 'P', name: 'Phosphorus', mass: '30.97', category: 'nonmetals', row: 3, col: 15,
+             state: 'Solid', melting: '317.3 K', boiling: '553.6 K', density: '1.82 g/cm³', 
+             electronConfig: '[Ne]3s²3p³', electronegativity: '2.19', ionizationEnergy: '10.49 eV', atomicRadius: '180 pm',
+             crystal: 'Cubic', discovery: 'Discovered by Hennig Brand in 1669',
+             summary: 'Phosphorus is essential for life, forming the backbone of DNA and RNA. It is used in fertilizers, matches, steel production, and as phosphates in detergents.'},
+            {number: 16, symbol: 'S', name: 'Sulfur', mass: '32.07', category: 'nonmetals', row: 3, col: 16,
+             state: 'Solid', melting: '388.36 K', boiling: '717.8 K', density: '2.07 g/cm³', 
+             electronConfig: '[Ne]3s²3p⁴', electronegativity: '2.58', ionizationEnergy: '10.36 eV', atomicRadius: '180 pm',
+             crystal: 'Orthorhombic', discovery: 'Known since ancient times',
+             summary: 'Sulfur is essential for life and is used in the production of sulfuric acid, fertilizers, gunpowder, matches, and insecticides. It is also used in vulcanizing rubber.'},
+            {number: 17, symbol: 'Cl', name: 'Chlorine', mass: '35.45', category: 'halogens', row: 3, col: 17,
+             state: 'Gas', melting: '171.6 K', boiling: '239.11 K', density: '3.214 g/L', 
+             electronConfig: '[Ne]3s²3p⁵', electronegativity: '3.16', ionizationEnergy: '12.97 eV', atomicRadius: '175 pm',
+             crystal: 'Orthorhombic', discovery: 'Discovered by Carl Wilhelm Scheele in 1774',
+             summary: 'Chlorine is a yellow-green gas that is widely used as a disinfectant for drinking water and swimming pools. It is also used in the production of plastics, solvents, and many other products.'},
+            {number: 18, symbol: 'Ar', name: 'Argon', mass: '39.95', category: 'noble-gases', row: 3, col: 18,
+             state: 'Gas', melting: '83.80 K', boiling: '87.30 K', density: '1.784 g/L', 
+             electronConfig: '[Ne]3s²3p⁶', electronegativity: 'N/A', ionizationEnergy: '15.76 eV', atomicRadius: '188 pm',
+             crystal: 'FCC', discovery: 'Discovered by Lord Rayleigh and William Ramsay in 1894',
+             summary: 'Argon is the third most abundant gas in Earth\'s atmosphere. It is used as an inert shielding gas in welding, in light bulbs, and as a preservative for historical documents.'},
+            
+            // Row 4 (selected elements for brevity)
+            {number: 19, symbol: 'K', name: 'Potassium', mass: '39.10', category: 'alkali-metals', row: 4, col: 1,
+             state: 'Solid', melting: '336.53 K', boiling: '1032 K', density: '0.89 g/cm³', 
+             electronConfig: '[Ar]4s¹', electronegativity: '0.82', ionizationEnergy: '4.34 eV', atomicRadius: '280 pm',
+             crystal: 'BCC', discovery: 'Isolated by Humphry Davy in 1807',
+             summary: 'Potassium is an essential nutrient for plants and animals. It is used in fertilizers and as potassium compounds in various industrial applications.'},
+            {number: 20, symbol: 'Ca', name: 'Calcium', mass: '40.08', category: 'alkaline-earth', row: 4, col: 2,
+             state: 'Solid', melting: '1115 K', boiling: '1757 K', density: '1.55 g/cm³', 
+             electronConfig: '[Ar]4s²', electronegativity: '1.00', ionizationEnergy: '6.11 eV', atomicRadius: '231 pm',
+             crystal: 'FCC', discovery: 'Isolated by Humphry Davy in 1808',
+             summary: 'Calcium is essential for living organisms, particularly bone formation. It is used in steel making, cement production, and as calcium compounds in various applications.'},
+            
+            // Transition metals (selected)
+            {number: 26, symbol: 'Fe', name: 'Iron', mass: '55.85', category: 'transition-metals', row: 4, col: 8,
+             state: 'Solid', melting: '1811 K', boiling: '3134 K', density: '7.874 g/cm³', 
+             electronConfig: '[Ar]3d⁶4s²', electronegativity: '1.83', ionizationEnergy: '7.90 eV', atomicRadius: '156 pm',
+             crystal: 'BCC', discovery: 'Known since ancient times',
+             summary: 'Iron is the most common element on Earth by mass. It is used in steel production, construction, transportation, and various industrial applications. It is also essential for biological processes.'},
+            {number: 29, symbol: 'Cu', name: 'Copper', mass: '63.55', category: 'transition-metals', row: 4, col: 11,
+             state: 'Solid', melting: '1357.77 K', boiling: '2835 K', density: '8.96 g/cm³', 
+             electronConfig: '[Ar]3d¹⁰4s¹', electronegativity: '1.90', ionizationEnergy: '7.73 eV', atomicRadius: '145 pm',
+             crystal: 'FCC', discovery: 'Known since ancient times',
+             summary: 'Copper is an excellent conductor of electricity and heat. It is used in electrical wiring, plumbing, coinage, and various alloys such as brass and bronze.'},
+            
+            // Selected other elements
+            {number: 47, symbol: 'Ag', name: 'Silver', mass: '107.87', category: 'transition-metals', row: 5, col: 11,
+             state: 'Solid', melting: '1234.93 K', boiling: '2435 K', density: '10.49 g/cm³', 
+             electronConfig: '[Kr]4d¹⁰5s¹', electronegativity: '1.93', ionizationEnergy: '7.58 eV', atomicRadius: '165 pm',
+             crystal: 'FCC', discovery: 'Known since ancient times',
+             summary: 'Silver has the highest electrical and thermal conductivity of any metal. It is used in jewelry, silverware, electronics, photography, and as an antimicrobial agent.'},
+            {number: 79, symbol: 'Au', name: 'Gold', mass: '196.97', category: 'transition-metals', row: 6, col: 11,
+             state: 'Solid', melting: '1337.33 K', boiling: '3129 K', density: '19.30 g/cm³', 
+             electronConfig: '[Xe]4f¹⁴5d¹⁰6s¹', electronegativity: '2.54', ionizationEnergy: '9.23 eV', atomicRadius: '174 pm',
+             crystal: 'FCC', discovery: 'Known since ancient times',
+             summary: 'Gold is prized for its beauty, rarity, and resistance to corrosion. It is used in jewelry, electronics, dentistry, and as a monetary standard and investment.'},
+            {number: 82, symbol: 'Pb', name: 'Lead', mass: '207.2', category: 'post-transition', row: 6, col: 14,
+             state: 'Solid', melting: '600.61 K', boiling: '2022 K', density: '11.34 g/cm³', 
+             electronConfig: '[Xe]4f¹⁴5d¹⁰6s²6p²', electronegativity: '1.87', ionizationEnergy: '7.42 eV', atomicRadius: '175 pm',
+             crystal: 'FCC', discovery: 'Known since ancient times',
+             summary: 'Lead has been used since ancient times due to its malleability and resistance to corrosion. Today it is used in batteries, radiation shielding, and sound insulation, though its use is declining due to toxicity concerns.'},
+            {number: 92, symbol: 'U', name: 'Uranium', mass: '238.03', category: 'actinides', row: 7, col: 3,
+             state: 'Solid', melting: '1405.3 K', boiling: '4404 K', density: '19.1 g/cm³', 
+             electronConfig: '[Rn]5f³6d¹7s²', electronegativity: '1.38', ionizationEnergy: '6.19 eV', atomicRadius: '186 pm',
+             crystal: 'Orthorhombic', discovery: 'Discovered by Martin Heinrich Klaproth in 1789',
+             summary: 'Uranium is primarily used as fuel in nuclear power plants. It is also used in nuclear weapons, radiation shielding, and as a colorant for glass and ceramics.'}
+        ];
+        
+        // Define the table layout with placeholders
+        const tableLayout = [
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 7, 8, 9, 10],
+            [11, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 14, 15, 16, 17, 18],
+            [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
+            [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54],
+            [55, 56, '*', 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86],
+            [87, 88, '**', 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, '*', 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71],
+            [0, 0, '**', 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+        ];
+        
+        // Function to get category class from element category
+        function getCategoryClass(category) {
+            switch (category) {
+                case 'alkali-metals': return 'alkali-metals';
+                case 'alkaline-earth': return 'alkaline-earth';
+                case 'transition-metals': return 'transition-metals';
+                case 'post-transition': return 'post-transition';
+                case 'metalloids': return 'metalloids';
+                case 'nonmetals': return 'nonmetals';
+                case 'halogens': return 'halogens';
+                case 'noble-gases': return 'noble-gases';
+                case 'lanthanides': return 'lanthanides';
+                case 'actinides': return 'actinides';
+                default: return 'unknown';
+            }
+        }
+        
+        // Function to get element by atomic number
+        function getElementByNumber(number) {
+            return elements.find(element => element.number === number);
+        }
+        
+        // Function to get element icon
+        function getElementIcon(symbol) {
+            return elementIcons[symbol] || elementIcons['default'];
+        }
+        
+        // Create the periodic table
+        const periodicTable = document.getElementById('periodic-table');
+        const elementDetails = document.getElementById('element-details');
+        const overlay = document.getElementById('overlay');
+        const closeBtn = document.getElementById('close-btn');
+        
+        // Generate the table from the layout
+        tableLayout.forEach((row, rowIndex) => {
+            row.forEach((value, colIndex) => {
+                let cell = document.createElement('div');
+                
+                if (value === 0) {
+                    // Empty cell
+                    cell.className = 'placeholder';
+                } else if (value === '*' || value === '**') {
+                    // Lanthanide/Actinide marker
+                    cell.className = 'element';
+                    cell.textContent = value;
+                    cell.style.backgroundColor = value === '*' ? 'var(--lanthanides)' : 'var(--actinides)';
+                    cell.style.color = '#000';
+                } else {
+                    // Element cell
+                    const element = getElementByNumber(value);
+                    
+                    if (element) {
+                        const categoryClass = getCategoryClass(element.category);
+                        const icon = getElementIcon(element.symbol);
+                        
+                        cell.className = `element ${categoryClass}`;
+                        cell.innerHTML = `
+                            <div class="atomic-number">${element.number}</div>
+                            <div class="symbol">${element.symbol}</div>
+                            <div class="name">${element.name}</div>
+                            <div class="mass">${element.mass}</div>
+                            <div class="icon">${icon}</div>
+                        `;
+                        
+                        // Set animation delay for staggered appearance
+                        cell.style.animationDelay = `${(rowIndex * 0.1) + (colIndex * 0.05)}s`;
+                        
+                        // Add click event listener
+                        cell.addEventListener('click', () => showElementDetails(element));
+                    } else {
+                        cell.className = 'element unknown';
+                        cell.innerHTML = `
+                            <div class="atomic-number">${value}</div>
+                            <div class="symbol">?</div>
+                            <div class="name">Unknown</div>
+                            <div class="mass">-</div>
+                            <div class="icon">❓</div>
+                        `;
+                    }
+                }
+                
+                periodicTable.appendChild(cell);
+            });
+        });
+        
+        // Function to show element details
+        function showElementDetails(element) {
+            const detailsSymbol = document.getElementById('details-symbol');
+            const detailsAtomicNumber = document.getElementById('details-atomic-number');
+            const detailsName = document.getElementById('details-name');
+            const detailsCategory = document.getElementById('details-category');
+            const detailsSummary = document.getElementById('details-summary');
+            const detailsAtomicNumberValue = document.getElementById('details-atomic-number-value');
+            const detailsAtomicMass = document.getElementById('details-atomic-mass');
+            const detailsElectronConfig = document.getElementById('details-electron-config');
+            const detailsPeriod = document.getElementById('details-period');
+            const detailsGroup = document.getElementById('details-group');
+            const detailsState = document.getElementById('details-state');
+            const detailsMelting = document.getElementById('details-melting');
+            const detailsBoiling = document.getElementById('details-boiling');
+            const detailsDensity = document.getElementById('details-density');
+            const detailsElectronegativity = document.getElementById('details-electronegativity');
+            const detailsIonization = document.getElementById('details-ionization');
+            const detailsRadius = document.getElementById('details-radius');
+            const detailsCrystal = document.getElementById('details-crystal');
+            const detailsDiscovery = document.getElementById('details-discovery');
+            
+            // Add the element icon to the symbol
+            const icon = getElementIcon(element.symbol);
+            detailsSymbol.innerHTML = `${element.symbol}<span style="position: absolute; bottom: -5px; right: -5px; font-size: 1.5rem;">${icon}</span>`;
+            detailsSymbol.className = `element-details-symbol ${getCategoryClass(element.category)}`;
+            
+            detailsAtomicNumber.textContent = element.number;
+            detailsName.textContent = element.name;
+            
+            // Format category name
+            let categoryName = '';
+            switch (element.category) {
+                case 'alkali-metals': categoryName = 'Alkali Metal'; break;
+                case 'alkaline-earth': categoryName = 'Alkaline Earth Metal'; break;
+                case 'transition-metals': categoryName = 'Transition Metal'; break;
+                case 'post-transition': categoryName = 'Post-Transition Metal'; break;
+                case 'metalloids': categoryName = 'Metalloid'; break;
+                case 'nonmetals': categoryName = 'Nonmetal'; break;
+                case 'halogens': categoryName = 'Halogen'; break;
+                case 'noble-gases': categoryName = 'Noble Gas'; break;
+                case 'lanthanides': categoryName = 'Lanthanide'; break;
+                case 'actinides': categoryName = 'Actinide'; break;
+                default: categoryName = 'Unknown'; break;
+            }
+            
+            detailsCategory.textContent = categoryName;
+            detailsCategory.className = `element-details-category ${getCategoryClass(element.category)}`;
+            
+            detailsSummary.textContent = element.summary;
+            detailsAtomicNumberValue.textContent = element.number;
+            detailsAtomicMass.textContent = `${element.mass} u`;
+            detailsElectronConfig.textContent = element.electronConfig;
+            detailsPeriod.textContent = element.row;
+            detailsGroup.textContent = element.col;
+            detailsState.textContent = element.state;
+            detailsMelting.textContent = element.melting;
+            detailsBoiling.textContent = element.boiling;
+            detailsDensity.textContent = element.density;
+            detailsElectronegativity.textContent = element.electronegativity;
+            detailsIonization.textContent = element.ionizationEnergy;
+            detailsRadius.textContent = element.atomicRadius;
+            detailsCrystal.textContent = element.crystal;
+            detailsDiscovery.textContent = element.discovery;
+            
+            // Show overlay and details
+            overlay.classList.add('active');
+            elementDetails.classList.add('active');
+        }
+        
+        // Close details on click
+        closeBtn.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            elementDetails.classList.remove('active');
+        });
+        
+        overlay.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            elementDetails.classList.remove('active');
+        });
+        
+        // Stop propagation on element details to prevent closing when clicking inside
+        elementDetails.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    </script>
 </body>
 </html>
