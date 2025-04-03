@@ -146,16 +146,6 @@
             margin-top: 2px;
         }
         
-        .element .icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.5rem;
-            opacity: 0.15;
-            pointer-events: none;
-        }
-        
         /* Category styles with gradients */
         .alkali-metals { 
             background: linear-gradient(145deg, var(--alkali-metals), #e65100);
@@ -491,6 +481,67 @@
             font-size: 0.9rem;
         }
         
+        .add-element-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #4fc3f7, #2196f3);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .add-element-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        .add-element-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .instruction-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .instruction-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+        }
+        
+        .instruction-panel p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .instruction-panel pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .instruction-panel code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
         /* Animation for elements appearing */
         @keyframes fadeInUp {
             from {
@@ -638,6 +689,65 @@
                 <span class="legend-text">Actinides</span>
             </div>
         </div>
+        
+        <div class="instruction-panel">
+            <h2>How to Add More Elements</h2>
+            <p>To add more elements to the periodic table, you need to:</p>
+            <ol>
+                <li>Add the element's data to the <code>elements</code> array in the JavaScript code</li>
+                <li>Ensure the element is properly positioned in the <code>tableLayout</code> array</li>
+                <li>Optionally add an icon for the element in the <code>elementIcons</code> object</li>
+            </ol>
+            
+            <h3>Step 1: Add Element Data</h3>
+            <p>Add a new object to the <code>elements</code> array with the following format:</p>
+            <pre>
+{
+    number: 21,                        // Atomic number
+    symbol: 'Sc',                      // Element symbol
+    name: 'Scandium',                  // Element name
+    mass: '44.96',                     // Atomic mass
+    category: 'transition-metals',     // Category (see list below)
+    row: 4,                            // Period in periodic table
+    col: 3,                            // Group in periodic table
+    state: 'Solid',                    // Physical state at STP
+    melting: '1814 K',                 // Melting point
+    boiling: '3109 K',                 // Boiling point
+    density: '2.985 g/cm³',            // Density
+    electronConfig: '[Ar]3d¹4s²',      // Electron configuration
+    electronegativity: '1.36',         // Electronegativity
+    ionizationEnergy: '6.56 eV',       // Ionization energy
+    atomicRadius: '184 pm',            // Atomic radius
+    crystal: 'HCP',                    // Crystal structure
+    discovery: 'Discovered by Lars Fredrik Nilson in 1879',  // Discovery info
+    summary: 'Scandium is a silvery-white metallic element...'  // Brief description
+}
+            </pre>
+            
+            <h3>Available Categories:</h3>
+            <ul>
+                <li><code>'alkali-metals'</code> - Alkali Metals (Group 1)</li>
+                <li><code>'alkaline-earth'</code> - Alkaline Earth Metals (Group 2)</li>
+                <li><code>'transition-metals'</code> - Transition Metals</li>
+                <li><code>'post-transition'</code> - Post-Transition Metals</li>
+                <li><code>'metalloids'</code> - Metalloids</li>
+                <li><code>'nonmetals'</code> - Nonmetals</li>
+                <li><code>'halogens'</code> - Halogens (Group 17)</li>
+                <li><code>'noble-gases'</code> - Noble Gases (Group 18)</li>
+                <li><code>'lanthanides'</code> - Lanthanides</li>
+                <li><code>'actinides'</code> - Actinides</li>
+                <li><code>'unknown'</code> - Unknown Properties</li>
+            </ul>
+            
+            <h3>Step 2: Update the Table Layout</h3>
+            <p>Make sure the element's atomic number is placed in the correct position in the <code>tableLayout</code> array. This array represents the layout of the periodic table with rows and columns.</p>
+            
+            <h3>Step 3: Add an Icon (Optional)</h3>
+            <p>Add an entry to the <code>elementIcons</code> object with the element's symbol as the key and an emoji as the value:</p>
+            <pre>
+'Sc': '⚙️',  // Scandium icon
+            </pre>
+        </div>
     </div>
     
     <div class="element-details" id="element-details">
@@ -728,7 +838,7 @@
     <div class="overlay" id="overlay"></div>
     
     <script>
-        // Element icons for visual representation
+        // Element icons for visual representation (only used in the detailed view)
         const elementIcons = {
             'H': '⚛️', // Hydrogen
             'He': '🎈', // Helium (balloon)
@@ -971,7 +1081,6 @@
                     
                     if (element) {
                         const categoryClass = getCategoryClass(element.category);
-                        const icon = getElementIcon(element.symbol);
                         
                         cell.className = `element ${categoryClass}`;
                         cell.innerHTML = `
@@ -979,7 +1088,6 @@
                             <div class="symbol">${element.symbol}</div>
                             <div class="name">${element.name}</div>
                             <div class="mass">${element.mass}</div>
-                            <div class="icon">${icon}</div>
                         `;
                         
                         // Set animation delay for staggered appearance
@@ -994,7 +1102,6 @@
                             <div class="symbol">?</div>
                             <div class="name">Unknown</div>
                             <div class="mass">-</div>
-                            <div class="icon">❓</div>
                         `;
                     }
                 }
